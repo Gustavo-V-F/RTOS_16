@@ -1,5 +1,5 @@
-#ifndef _RAND_H
-#define _RAND_H
+#ifndef CKS32F1XX_RAND_H
+#define CKS32F1XX_RAND_H
 
 #include <stdint.h>
 
