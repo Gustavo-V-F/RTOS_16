@@ -41,6 +41,7 @@ Src/tiny_printf.c \
 Src/syscalls.c \
 Src/FreeRTOS_openocd.c \
 Src/freertos.c \
+Src/cks32f1xx_rand.c \
 Src/usb_device.c \
 Src/usbd_conf.c \
 Src/usbd_desc.c \

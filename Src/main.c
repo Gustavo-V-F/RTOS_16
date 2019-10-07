@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdint.h>
+#include "cks32f1xx_rand.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,8 @@
 osThreadId Print1_handle;
 osThreadId Print2_handle;
 osMutexId xMutex_USB_handle;
+static const char *pcTask1_string = "Task1 -----------------\r\n";
+static const char *pcTask2_string = "Task2 *****************\r\n";
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -74,7 +77,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -98,8 +100,11 @@ int main(void)
   MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
-
-
+  
+  /* rand function implented in the POSIX.1-2001 example */
+  /* Initialize ulRand function with a seed */  
+  vSrand(567);
+  
   /* USER CODE END 2 */
 
   /* Create the mutex(es) */
@@ -125,12 +130,12 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of Print1 */
-  osThreadDef(Print1, prvPrint_task, osPriorityNormal, 0, 100);
-  Print1_handle = osThreadCreate(osThread(Print1), NULL);
+  osThreadDef(Print1, prvPrint_task, osPriorityNormal, 1, 100);
+  Print1_handle = osThreadCreate(osThread(Print1), (void *) pcTask1_string);
 
   /* definition and creation of Print2 */
-  osThreadDef(Print2, prvPrint_task, osPriorityAboveNormal, 0, 100);
-  Print2_handle = osThreadCreate(osThread(Print2), NULL);
+  osThreadDef(Print2, prvPrint_task, osPriorityAboveNormal, 1, 100);
+  Print2_handle = osThreadCreate(osThread(Print2), (void *) pcTask2_string);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -225,9 +230,15 @@ void prvPrint_task(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
+  char *pcString_to_print;
+  pcString_to_print = (char *) argument;
   for(;;)
   {
-    _delay_ms(1);
+    osMutexWait(xMutex_USB_handle, osWaitForever);
+    printf(pcString_to_print);
+    osMutexRelease(xMutex_USB_handle);
+
+    osDelay((1 + (ulRand() % 999)));
   }
   /* USER CODE END 5 */ 
 }
